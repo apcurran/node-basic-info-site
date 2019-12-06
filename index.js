@@ -1,20 +1,26 @@
-const http = require("http");
-const fs = require("fs");
+const express = require("express");
+const app = express();
 
-const server = http.createServer((req, res) => {
-    if (req.url === "/home" || req.url === "/") {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        fs.createReadStream(`${__dirname}/pages/index.html`).pipe(res);
-    } else if (req.url === "/contact") {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        fs.createReadStream(`${__dirname}/pages/contact-me.html`).pipe(res);
-    } else if (req.url === "/about") {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        fs.createReadStream(`${__dirname}/pages/about.html`).pipe(res);
-    } else {
-        res.writeHead(404, { "Content-Type": "text/html" });
-        fs.createReadStream(`${__dirname}/pages/404.html`).pipe(res);
-    }
+app.get("/", (req, res) => {
+    console.log(__dirname);
+    res.sendFile(`${__dirname}/pages/index.html`);
 });
 
-server.listen(8080);
+app.get("/about", (req, res) => {
+    res.sendFile(`${__dirname}/pages/about.html`);
+});
+
+app.get("/contact", (req, res) => {
+    res.sendFile(`${__dirname}/pages/contact-me.html`);
+});
+
+// Last route, redirect missing to 404
+app.get("*", (req, res) => {
+    res.sendFile(`${__dirname}/pages/404.html`);
+});
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+});
+
+app.listen(8080);
